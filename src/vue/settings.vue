@@ -14,8 +14,6 @@ const errorMessage = ref("")
 
 function tryLoadSave() {
   try {
-    const decoded = atob(saveInput.value.trim())
-    const restored = JSON.parse(decoded)
     localStorage.setItem("incrementalSave", saveInput.value.trim())
     loadGame()
     showLoadPopup.value = false

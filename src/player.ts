@@ -1,5 +1,4 @@
-import { createApp, reactive } from 'vue'
-import App from './vue/App.vue'
+import {  reactive } from 'vue'
 import Decimal from 'break_eternity.js'
 import { startDialogue } from '../images/dialogue.ts'
 import { autoBuyAll, pointgen, pupgrades, repeatableUpgrades } from './points.ts'
