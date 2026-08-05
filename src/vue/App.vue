@@ -5,22 +5,15 @@ import Points from './points.vue'
 import { pointgen, pupgrades } from '../points.ts'
 import Matterions from './matterions.vue'
 import { formatNumber } from '../format.ts'
-import { hardReset } from '../save.ts'
 import Finity from './finity.vue'
 import Settings from './settings.vue'
 import Finityupgrades from './finityupgrades.vue'
 import Corruption from './corruption.vue'
-import { secretdebug, balancefixing, failing, okthisoneisforpoints, activateDialogue, dialogueInput, debugToFupgrade6 } from '../basicallyallthetesting.ts'
 import { player } from '../player.ts'
 import FC from './FC.vue'
 import CMM from './CMM.vue'
 import Decorruptionizer from './Decorruptionizer.vue'
 import Infinity from './infinity.vue'
-
-const fpAmount = ref<number>(0)
-const pointA = ref<number>(0)
-function addFP() { secretdebug(fpAmount.value) }
-function addPoint() { okthisoneisforpoints(pointA.value) }
 
 function makePersistentTab(key: string, options: string[], initial: string) {
   const tab = ref(initial)
