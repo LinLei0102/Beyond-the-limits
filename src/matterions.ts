@@ -1,5 +1,5 @@
 import Decimal from "break_eternity.js";
-import { player } from "./main";
+import { player } from "./player";
 import { matterionAutomationEnabled } from "./settings"
 
 export function focus() {

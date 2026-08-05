@@ -1,48 +1,53 @@
 import Decimal from "break_eternity.js"
-import { player } from "./main"
+import { player } from "./player"
 import { getRepeatableCost } from "./points"
+import { iupgrades as iupgradeDefs } from "./infinity/infinity"
 
 export function saveGame() {
-  const saveData = JSON.stringify(player, (_key, value) => {
+  const saveData = JSON.stringify(player, (key, value) => {
     if (value instanceof Decimal) return value.toString()
+
+    if (key === "title" || key === "description" || key === "effect" || key === "effectDisplay" || key === "cost") {
+      return undefined
+    }
+
     return value
   })
-  localStorage.setItem("incrementalSave", saveData)
+
+  const encoded = btoa(saveData)
+  localStorage.setItem("incrementalSave", encoded)
+}
+
+function sanitizeSave(restored: any) {
+  if (restored.iupgrades) {
+    for (const upg of restored.iupgrades) {
+      delete upg.title
+      delete upg.description
+      delete upg.effect
+      delete upg.effectDisplay
+    }
+  }
+  return restored
 }
 
 export function loadGame() {
   const saved = localStorage.getItem("incrementalSave")
   if (!saved) return
 
-  const restored = JSON.parse(saved)
-
-  function restoreValues(target: any, src: any) {
-    if (src == null) return
-    for (const key of Object.keys(target)) {
-      const tVal = target[key]
-      const sVal = src?.[key]
-      if (sVal === undefined) continue
-
-      if (tVal instanceof Decimal) {
-        target[key] = new Decimal(sVal ?? 0)
-      } else if (Array.isArray(tVal) && Array.isArray(sVal)) {
-        for (let i = 0; i < tVal.length; i++) {
-          if (sVal[i] === undefined) continue
-          if (tVal[i] instanceof Decimal) {
-            tVal[i] = new Decimal(sVal[i] ?? 0)
-          } else if (typeof tVal[i] === "object" && tVal[i] !== null) {
-            restoreValues(tVal[i], sVal[i])
-          } else {
-            tVal[i] = sVal[i]
-          }
-        }
-      } else if (typeof tVal === "object" && tVal !== null) {
-        restoreValues(tVal, sVal)
-      } else {
-        target[key] = sVal
-      }
+  let restored: any
+  try {
+    const decoded = atob(saved)
+    restored = JSON.parse(decoded)
+  } catch {
+    try {
+      restored = JSON.parse(saved)
+    } catch (err) {
+      console.error("Failed to load save", err)
+      return
     }
   }
+
+  restored = sanitizeSave(restored)
 
   restoreValues(player, restored)
 
@@ -54,6 +59,36 @@ export function loadGame() {
   player.iupgrades.forEach((upg: any) => {
     if (!(upg.cost instanceof Decimal)) upg.cost = new Decimal(upg.cost ?? 0)
   })
+
+}
+
+
+function restoreValues(target: any, src: any) {
+  if (src == null) return
+  for (const key of Object.keys(target)) {
+    const tVal = target[key]
+    const sVal = src?.[key]
+    if (sVal === undefined) continue
+
+    if (tVal instanceof Decimal) {
+      target[key] = new Decimal(sVal ?? 0)
+    } else if (Array.isArray(tVal) && Array.isArray(sVal)) {
+      for (let i = 0; i < tVal.length; i++) {
+        if (sVal[i] === undefined) continue
+        if (tVal[i] instanceof Decimal) {
+          tVal[i] = new Decimal(sVal[i] ?? 0)
+        } else if (typeof tVal[i] === "object" && tVal[i] !== null) {
+          restoreValues(tVal[i], sVal[i])
+        } else {
+          tVal[i] = sVal[i]
+        }
+      }
+    } else if (typeof tVal === "object" && tVal !== null) {
+      restoreValues(tVal, sVal)
+    } else {
+      target[key] = sVal
+    }
+  }
 }
 
 export function hardReset() {
@@ -66,14 +101,18 @@ export function hardReset() {
   })
   player.fupgrades.forEach(upg => upg.bought = false)
 
-  player.iupgrades.forEach(upg => {
-    upg.bought = false
-    upg.cost = upg.id === "1" ? new Decimal(0) : new Decimal(2)
-  })
+player.iupgrades.forEach((upg, i) => {
+  upg.bought = false
+  upg.cost = new Decimal(iupgradeDefs[i].cost)
+})
+
 
   player.maincurrencies.Points = new Decimal(0)
   player.maincurrencies.IP = new Decimal(0)
   player.maincurrencies.FP = new Decimal(0)
 
+
+  location.reload()
+  location.reload()
   location.reload()
 }

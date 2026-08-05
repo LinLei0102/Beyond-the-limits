@@ -1,11 +1,11 @@
 import { reactive, computed } from "vue"
 import Decimal from "break_eternity.js"
-import { player } from "./main"
+import { player } from "./player"
 import { monoboost } from "./matterions"
 import { formatNumber } from "./format"
 import { boost } from "./CM"
-import type { upgrades } from "./main"
-import type { RepeatableUpgrade } from "./main"
+import type { upgrades } from "./player"
+import type { RepeatableUpgrade } from "./player"
 import { pointupgrepenabled } from "./settings"
 import { solarenergyboost } from "./infinity/infinity"
 
@@ -67,6 +67,7 @@ export function pointgen(): Decimal {
   if (player.pupgrades[23].bought) { gain = gain.pow(1.2)}
   if (player.pupgrades[24].bought) {gain = gain.mul(1e65)}
   if (player.fupgrades[7]?.bought) { gain = gain.mul(player.fupgrades[7].effect?.() ?? 1)}
+  if(player.fupgrades[5]?.bought) { gain = gain.mul(10)}
   if (player.iupgrades[0]?.bought && player.infinity.solarity.solarenergy.gte(0.0001)) { gain = gain.mul(solarenergyboost())}
   return gain.isFinite() && !gain.isNan() ? gain : new Decimal(1)
 }
@@ -414,7 +415,7 @@ export const repeatableUpgrades = reactive<RepeatableUpgrade[]>([
   {
     id: "1",
     title: "Eternal corruption",
-    description: "Boost corruption point gain by x1.2 per upgrade bought",
+    description: "Boost corruption point gain by x1.5 per upgrade bought",
     amountbought: new Decimal(0),
     basecost: new Decimal("2e23"),
     cost: new Decimal("2e23"),

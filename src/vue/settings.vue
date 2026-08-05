@@ -2,7 +2,7 @@
 import { ref } from "vue"
 import { loadGame, saveGame, hardReset } from "../save"
 import { matterionAutomationEnabled, pointupgrepenabled } from "../settings"
-import { player } from "../main.ts"
+import { player } from "../player.ts"
 import Decimal from "break_eternity.js"
 
 const showLoadPopup = ref(false)
