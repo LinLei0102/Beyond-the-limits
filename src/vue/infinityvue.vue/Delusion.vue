@@ -1,16 +1,32 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { formatNumber } from '../../format';
 import { buyDelupgrade, delRepeats, enterdelusion, ppgain } from '../../infinity/del';
 import { player } from '../../player';
+import Decimal from 'break_eternity.js';
 
+const pendingPP = computed(() => {
+    return player.infinity.del.inDel ? ppgain() : new Decimal("0")
+})
 </script>
 
 <template>
   <div class="delusion">
     <h1 class="delu-text">hi ok so small spoilers like something really epic and cool was meant to happen when you reach finity in delusion but like ya your gonna have to wait for v0.3 mb i got artemis ohio beam'd by a billion things</h1>
     <h1 class="delu-text">"False dreams arise within your eyes..."</h1>
-    <h1 class="delu-texty">Best points in delusion: {{ formatNumber(player.infinity.del.bestPoints) }} <br> You have {{ formatNumber(player.infinity.del.PPoints) }} ({{ formatNumber(ppgain()) }}/s) psuedo-points.</h1>
-    <button class="delu-button" @click="enterdelusion()">ENTER THE DELUSION</button>
+<h1 class="delu-texty">
+  Best points in delusion: {{ formatNumber(player.infinity.del.bestPoints) }}
+  <br>
+  You have {{ formatNumber(player.infinity.del.PPoints) }} pseudo-points.
+
+  <span v-if="player.infinity.del.inDel">
+    <br>
+    You will gain {{ formatNumber(pendingPP) }} pseudo-points on exit.
+  </span>
+</h1>
+    <button class="delu-button" @click="enterdelusion()">
+  {{ player.infinity.del.inDel ? "EXIT THE DELUSION" : "ENTER THE DELUSION" }}
+</button>
     </div>
           <div id="hindRepeat">
     <div

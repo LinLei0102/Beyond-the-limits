@@ -9,24 +9,44 @@ export function delusionality() {
 }
 
 export function enterdelusion() {
-    if(player.infinity.del.inDel == false) {player.infinity.del.inDel = true; delusionality()}
-    else player.infinity.del.inDel = false
-}
+    const del = player.infinity.del
 
+    if (!del.inDel) {
+        del.inDel = true
+        del.bestPoints = player.maincurrencies.Points
+        delusionality()
+        return
+    }
+    const gained = ppgain()
+
+    del.PPoints = del.PPoints.add(gained)
+    del.inDel = false
+    del.bestPoints = new Decimal(0)
+}
 export function updateBestPoints() {
-  if (player.infinity.del.inDel &&
-      player.maincurrencies.Points.gt(player.infinity.del.bestPoints)) {
-    player.infinity.del.bestPoints = player.maincurrencies.Points
+    const del = player.infinity.del
 
-  }
+    if (
+        del.inDel &&
+        player.maincurrencies.Points.gt(del.bestPoints)
+    ) {
+        del.bestPoints = player.maincurrencies.Points
+    }
 }
+
 
 export function ppgain() {
-    let gain = player.infinity.del.bestPoints
-    if(delRepeats[0].amountbought.gte(1)) gain = gain.mul(delRepeats[0].effect())
+    const del = player.infinity.del
+    if (!del.inDel) return new Decimal(0)
+
+    let gain = player.maincurrencies.Points
+
+    if (delRepeats[0].amountbought.gte(1)) {
+        gain = gain.mul(delRepeats[0].effect())
+    }
+
     return gain
 }
-
 export const delRepeats = reactive<repeatableupgradebutbetterlmao[]>([ 
     {
         id: "0",
