@@ -575,7 +575,7 @@ export function SPgain() {
   let gain = new Decimal("0")
   if(player.infinity.stats.stage.gte(70)) gain = gain.add(player.infinity.stats.stage.div(70).pow(1.5))
   if(player.infinity.stats.SP.gte(15)) gain = gain.mul(player.infinity.stats.CosP.add(1).pow(0.25))
-    if(player.infinity.stats.SP.gte(1e130)) gain = gain.div("1e130").pow(0.5).mul("1e130")
+    if(player.infinity.stats.SP.gte(1e130)) gain = gain.div("1e130").pow(0.514).mul("1e130")
     if(player.infinity.stats.SP.gte("1e1000")) gain = gain.div("1e1000").pow(0.05).mul("1e1000")
 
   if(hindRepeats[1].effect().gte(1)) gain = gain.mul(hindRepeats[1].effect())

@@ -96,7 +96,7 @@ if (gain.gt("1e100000")) {
   gain = gain.div("1e100000").pow(0.005).mul("1e100000")
 }
 if(player.infinity.del.inDel) {gain = gain.log10()
-  gain = gain.div(10)
+  gain = gain.div(1000)
 }
 if(player.infinity.del.inDel && delRepeats[1].effect().gte(1)) gain = gain.mul(delRepeats[1].effect())
   return gain.isFinite() && !gain.isNan() ? gain : new Decimal(1)

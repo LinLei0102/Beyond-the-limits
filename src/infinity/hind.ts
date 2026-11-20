@@ -178,7 +178,7 @@ export const hindRepeats = reactive<repeatableupgradebutbetterlmao[]>([
     basecost: new Decimal("200"),
     cost() {
     let scale = this.basecost.mul(
-        Decimal.pow(1.125, this.amountbought)
+        Decimal.pow(1.15, this.amountbought)
     )
     if(this.amountbought.gte(5)) {
       scale = this.basecost.mul(Decimal.pow(1.2, this.amountbought ))

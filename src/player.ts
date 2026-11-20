@@ -408,10 +408,14 @@ setInterval(() => {
   if(player.infinity.stats.SP.gte(5)) likeareallyfastattackenemyfunction()
     if(player.infinity.stats.SP.gte(10)) autoBuyPlayerRepeats()
       if(player.infinity.stats.SP.gte(1e24)) autoBuyCoSPRepeats()
-  updateBestPoints()
+
   matterupdate()
 }, TICK_MS)
 
 setInterval(() => {
   saveGame()
 }, 10000)
+
+setInterval(() => {
+  updateBestPoints()
+}, 2)

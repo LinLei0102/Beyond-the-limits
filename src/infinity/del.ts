@@ -13,15 +13,14 @@ export function enterdelusion() {
 
     if (!del.inDel) {
         del.inDel = true
-        del.bestPoints = player.maincurrencies.Points
         delusionality()
         return
     }
+
     const gained = ppgain()
 
     del.PPoints = del.PPoints.add(gained)
     del.inDel = false
-    del.bestPoints = new Decimal(0)
 }
 export function updateBestPoints() {
     const del = player.infinity.del
