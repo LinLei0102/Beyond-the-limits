@@ -1,21 +1,52 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import Decimal from 'break_eternity.js';
-import { infinitygain, infinityreset, iupgrades, buyIUpgradesReal } from '../infinity/infinity';
+import { infinityreset, iupgrades, buyIUpgradesReal, infinitygain } from '../infinity/infinity';
 import { player } from '../player.ts';
 import { formatNumber } from '../format';
 import solarity from './infinityvue.vue/solarity.vue'
 import CT from './infinityvue.vue/CT.vue';
+import EL from './infinityvue.vue/EL.vue';
+import FoI from './infinityvue.vue/FoI.vue';
+import Matter from './infinityvue.vue/matter.vue';
+import ce from './infinityvue.vue/CE.vue';
+import Hind from './infinityvue.vue/hind.vue';
 
-const BASE_REQ = new Decimal("1.79e308");
 
-function nextIPRequirement() {
-  return BASE_REQ.pow(player.maincurrencies.IP.add(1));
-}
+type InfinityTab =
+  | 'infinity'
+  | 'iupgrades'
+  | 'Solarity'
+  | 'Calamity tier'
+  | 'Eternal letters'
+  | 'Matter'
+  | 'Farm of Infinity'
+  | 'Calamity energy'
+  | 'Hindrance';
 
-const savedTab = (localStorage.getItem('activeTab') as 'infinity'  |'iupgrades'| 'Solarity' | null) ?? 'infinity';
-const activeTab = ref<'infinity' | 'iupgrades' | 'Solarity' | 'Calamity tier'>(savedTab);
+const validTabs: InfinityTab[] = [
+  'infinity',
+  'iupgrades',
+  'Solarity',
+  'Calamity tier',
+  'Eternal letters',
+  'Matter',
+  'Farm of Infinity',
+  'Calamity energy',
+  'Hindrance'
+];
 
+const savedTab = localStorage.getItem('lastInfinityTab');
+
+const activeTab = ref<InfinityTab>(
+  validTabs.includes(savedTab as InfinityTab)
+    ? (savedTab as InfinityTab)
+    : 'infinity'
+);
+
+watch(activeTab, (tab) => {
+  localStorage.setItem('lastInfinityTab', tab);
+});
 
 const visibleInfinityUpgrades = computed(() => {
   const lastBoughtIndex = iupgrades.findIndex(
@@ -31,22 +62,26 @@ const visibleInfinityUpgrades = computed(() => {
   <div class="infinity-tabs">
     <button :class="{active: activeTab === 'infinity'}" @click="activeTab = 'infinity'">Infinity</button>
     <button :class="{active: activeTab === 'iupgrades'}" @click="activeTab = 'iupgrades'">Upgrades</button>
-    <button :class="{active: activeTab === 'Solarity'}" @click="activeTab = 'Solarity'" v-if="iupgrades[0].bought">Solarity</button>
-    <button :class="{active: activeTab === 'Calamity tier'}" @click="activeTab = 'Calamity tier'" v-if="player.infinity.solarity.solaritylevel.gte(2)">Calamity tier</button>
+    <button :class="{active: activeTab === 'Solarity'}" @click="activeTab = 'Solarity'" v-if="iupgrades[3].bought">Solarity</button>
+    <button :class="{active: activeTab === 'Calamity tier'}" @click="activeTab = 'Calamity tier'" v-if="player.infinity.solarity.solaritylevel.gte(5) || player.infinity.calamitytier.gte(1)">Calamity tier</button>
+    <button :class="{active: activeTab === 'Eternal letters'}" @click="activeTab = 'Eternal letters'" v-if="player.infinity.calamitytier.gte(1)">Eternal letters</button>
+    <button :class="{active: activeTab === 'Matter'}" @click="activeTab = 'Matter'" v-if="player.infinity.eternalenergy.gte(1e6)">Matter</button>
+    <button :class="{active: activeTab === 'Farm of Infinity'}" @click="activeTab = 'Farm of Infinity'" v-if="player.infinity.calamitytier.gte(2)">Farm of infinity</button>
+    <button :class="{active: activeTab === 'Calamity energy'}" @click="activeTab = 'Calamity energy'" v-if="player.infinity.calamitytier.gte(3)">Calamity energy</button>
+    <button :class="{active: activeTab === 'Hindrance'}" @click="activeTab = 'Hindrance'" v-if="player.infinity.calamitytier.gte(15)">Hindrance</button>
   </div>
 
   <section v-if="activeTab === 'infinity'" class="infinity-panel">
     <button 
       id="infinity-button" 
       @click="infinityreset()" 
-      :class="{ disabled: player.maincurrencies.Points.lt(nextIPRequirement()) }"
+      :class="{ disabled: player.maincurrencies.Points.lt(1.79e308) }"
     >
       Endorse the infinity for {{ formatNumber(infinitygain()) }} IP
     </button>
     <h3 class="infinity-warm">This will reset everything before this except god of corruption's completion! Good luck with the new era.</h3>
     <h1 class="infinity-ipamount">
-      You currently have {{ formatNumber(player.maincurrencies.IP) }} IP 
-      (Gain +1 after {{ formatNumber(nextIPRequirement()) }} points!)
+      You currently have {{ formatNumber(player.maincurrencies.IP) }} IP
     </h1>
   </section>
 
@@ -61,6 +96,7 @@ const visibleInfinityUpgrades = computed(() => {
         <h3>{{ upg.title }}</h3>
         <p>{{ upg.description }}</p>
         <p>Cost: {{ formatNumber(upg.cost) }} IP</p>
+        <p>{{ (upg.effectDisplay?.()) }}</p>
         <button 
           :disabled="upg.bought || player.maincurrencies.IP.lt(upg.cost)" 
           @click.stop="buyIUpgradesReal(idx)"
@@ -75,6 +111,26 @@ const visibleInfinityUpgrades = computed(() => {
   </section>
     <section v-if="activeTab === 'Calamity tier'" class="infinity-panel">
     <c-t />
+  </section>
+  <keep-alive>
+  <section v-if="activeTab === 'Eternal letters'" class="infinity-panel">
+    <e-l />
+  </section>
+    </keep-alive>
+    <section v-if="activeTab === 'Matter'" class="infinity-panel">
+    <matter />
+  </section>
+
+  <keep-alive>
+    <section v-if="activeTab === 'Farm of Infinity'" class="infinity-panel">
+      <fo-i />
+    </section>
+  </keep-alive>
+  <section v-if="activeTab === 'Calamity energy'" class="infinity-panel">
+    <ce />
+  </section>
+    <section v-if="activeTab === 'Hindrance'" class="infinity-panel">
+    <hind />
   </section>
 </template>
 
@@ -258,7 +314,7 @@ const visibleInfinityUpgrades = computed(() => {
   font-family: monospace;
   text-align: center;
   transition: all 0.3s ease;
-  background: black; /* keep background black */
+  background: black;
 }
 .infinity-upgrade-card h3 {
   margin: 0;      
@@ -267,7 +323,6 @@ const visibleInfinityUpgrades = computed(() => {
   color: inherit;     
 }
 
-/* Purchase button */
 .infinity-upgrade-card button {
   background: black;
   color: dodgerblue;
@@ -282,7 +337,6 @@ const visibleInfinityUpgrades = computed(() => {
   text-shadow: 0 0 5px dodgerblue;
 }
 
-/* Bought state — lime override */
 .infinity-upgrade-card.bought {
   border-color: lime;
   color: lime;
@@ -294,5 +348,109 @@ const visibleInfinityUpgrades = computed(() => {
   color: lime !important;
   text-shadow: 0 0 10px lime !important;
   box-shadow: 0 0 15px lime !important;
+}
+@media (max-width: 768px) {
+
+  .infinity-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .infinity-tabs button {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
+    padding: 9px 10px;
+    font-size: 12px;
+    white-space: normal;
+  }
+
+  .infinity-panel {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  #infinity-button {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    min-height: 80px;
+    font-size: 16px;
+  }
+
+  .infinity-ipamount {
+    font-size: 22px;
+    overflow-wrap: anywhere;
+  }
+
+  .infinity-warm {
+    font-size: 13px;
+    overflow-wrap: anywhere;
+  }
+
+  .infinity-upgrade-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .infinity-upgrade-card {
+    width: 100%;
+    max-width: 300px;
+    min-width: 0;
+    box-sizing: border-box;
+    margin: 5px 0;
+  }
+
+  .infinity-upgrade-card button {
+    max-width: 100%;
+  }
+
+  .infinity-grid {
+    grid-template-columns: repeat(3, minmax(0, 70px));
+    grid-auto-rows: 70px;
+    gap: 5px;
+  }
+
+  .infinity-node {
+    min-width: 0;
+    font-size: 10px;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 1200px) {
+
+  .infinity-tabs {
+    gap: 5px;
+  }
+
+  .infinity-tabs button {
+    font-size: 10px;
+    padding: 8px 6px;
+  }
+
+  .infinity-panel {
+    padding: 7px;
+  }
+
+  .infinity-grid {
+    grid-template-columns: repeat(3, minmax(0, 60px));
+    grid-auto-rows: 60px;
+  }
+
+  .infinity-upgrade-card {
+    padding: 8px;
+  }
 }
 </style>

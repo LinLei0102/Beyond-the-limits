@@ -1,6 +1,8 @@
 import Decimal from "break_eternity.js";
-import { player } from "./player";
+import { player } from "./main";
 import { matterionAutomationEnabled } from "./settings"
+import { crops } from "./infinity/FoI.ts";
+
 
 export function focus() {
   if (player.mattergens.Mfocus) return "monofocus"
@@ -31,7 +33,7 @@ export function monogen() {
   if (player.fupgrades[0]?.bought) gain = gain.mul(2)
   if (player.fupgrades[2]?.bought) gain = gain.pow(1.1)
   if (player.corrupt.Incorruption) gain = gain.mul(0)
-
+  if (player.infinity.calamitytier.gte(2)) { gain = gain.mul(crops[1].effect() ?? 1)}
   return gain
 }
 
@@ -59,6 +61,7 @@ export function trigen() {
     if (player.fupgrades[0].bought) gain = gain.mul(2)
     if (player.fupgrades[4].bought) gain = gain.mul(10)
     if (player.corrupt.Incorruption) gain = gain.mul(0)
+    if (player.infinity.calamitytier.gte(2)) { gain = gain.mul(crops[1].effect() ?? 1)}
   }
   return gain
 }
@@ -144,22 +147,33 @@ export function monoboost() {
   if (player.pupgrades[11].bought) boost = boost.mul(player.pupgrades[11].effect?.() || 1)
   if (player.fupgrades[0].bought) boost = boost.mul(2)
   if (player.corrupt.Incorruption) boost = boost.pow(0)
+    if (player.infinity.calamitytier.gte(2)) { boost = boost.mul(crops[1].effect() ?? 1).add(1)}
   return boost
 }
+
 
 
 export function autobuymatterion() {
   if (!matterionAutomationEnabled.value) return
   if (player.corrupt.Incorruption) return
-  if (player.fupgrades[1]?.bought && player.pupgrades[2].bought) {
-    while (player.maincurrencies.Points.gte(getUpgradeCost("mono"))) {
-      costlessmatterion("mono")
-    }
-    while (player.maincurrencies.Points.gte(getUpgradeCost("duo"))) {
-      costlessmatterion("duo")
-    }
-    while (player.maincurrencies.Points.gte(getUpgradeCost("tri"))) {
-      costlessmatterion("tri")
+
+  if (
+    !player.pupgrades[2].bought ||
+    !(player.fupgrades[1]?.bought ||
+      player.infinity.calamitytier.gte(2))
+  ) return
+
+  const MAX_PURCHASES_PER_TYPE = 100
+
+  for (const type of ["mono", "duo", "tri"] as const) {
+    let purchases = 0
+
+    while (
+      purchases < MAX_PURCHASES_PER_TYPE &&
+      player.maincurrencies.Points.gte(getUpgradeCost(type))
+    ) {
+      costlessmatterion(type)
+      purchases++
     }
   }
 }

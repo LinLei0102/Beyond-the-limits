@@ -1,48 +1,83 @@
 <script setup lang="ts">
+
 import { ref } from "vue"
-import { loadGame, saveGame, hardReset } from "../save"
+import { loadGame, saveGame, hardReset, exportSaveString } from "../save"
 import { matterionAutomationEnabled, pointupgrepenabled } from "../settings"
-import { player } from "../player.ts"
-import Decimal from "break_eternity.js"
+import { player } from "../player"
 
 const showLoadPopup = ref(false)
 const showExportPopup = ref(false)
-const showConfirmReset = ref(false) 
+const showConfirmReset = ref(false)
+
 const saveInput = ref("")
 const exportString = ref("")
 const errorMessage = ref("")
+const copied = ref(false)
 
 function tryLoadSave() {
+  const input = saveInput.value.trim()
+
   try {
-    localStorage.setItem("incrementalSave", saveInput.value.trim())
+    // Support both Base64 and older plain JSON saves
+    try {
+      JSON.parse(atob(input))
+    } catch {
+      JSON.parse(input)
+    }
+
+    localStorage.setItem("incrementalSave", input)
     loadGame()
+
     showLoadPopup.value = false
     errorMessage.value = ""
+    saveInput.value = ""
   } catch {
     errorMessage.value = "Invalid save!"
   }
 }
 
-
 function exportSave() {
   try {
-    const saveData = JSON.stringify(player, (_key, value) => {
-      if (value instanceof Decimal) return value.toString()
-      return value
-    })
-    const encoded = btoa(saveData)
-    exportString.value = encoded
+    exportString.value = exportSaveString()
+    copied.value = false
     showExportPopup.value = true
   } catch {
-    exportString.value = "Failed to export save!"
+    exportString.value = ""
+    errorMessage.value = "Failed to export save!"
     showExportPopup.value = true
   }
+}
+
+async function copyExport() {
+  try {
+    await navigator.clipboard.writeText(exportString.value)
+    copied.value = true
+  } catch {
+    copied.value = false
+    errorMessage.value = "Clipboard access denied. Select and copy the save manually."
+  }
+}
+
+function downloadExport() {
+  const blob = new Blob([exportString.value], {
+    type: "text/plain;charset=utf-8"
+  })
+
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement("a")
+
+  link.href = url
+  link.download = "beyond-the-limits-save.txt"
+  link.click()
+
+  URL.revokeObjectURL(url)
 }
 
 function confirmHardReset() {
   hardReset()
   showConfirmReset.value = false
 }
+
 function toggleMatterionAutomation() {
   matterionAutomationEnabled.value = !matterionAutomationEnabled.value
 }
@@ -50,6 +85,7 @@ function toggleMatterionAutomation() {
 function togglePointUpgradeAutomation() {
   pointupgrepenabled.value = !pointupgrepenabled.value
 }
+
 </script>
 
 <template>
@@ -83,16 +119,57 @@ function togglePointUpgradeAutomation() {
       </div>
     </div>
 
-    <div v-if="showExportPopup" class="popup-overlay">
-      <div class="popup">
-        <h3 id="loadingsave">Export Save</h3>
-        <textarea readonly :value="exportString"></textarea>
-        <div class="popup-buttons">
-          <button @click="showExportPopup = false" class="settings-btn danger">Close</button>
-        </div>
-      </div>
+
+  </div>
+
+<div v-if="showExportPopup" class="popup-overlay">
+  <div class="popup export-popup">
+    <h3 id="loadingsave">Export Save</h3>
+
+    <p class="export-description">
+      Your save is ready to be exported.
+    </p>
+
+    <div class="save-info">
+      <span>Save size: </span>
+      <span>{{ exportString.length.toLocaleString() }} characters</span>
+    </div>
+
+    <textarea
+      readonly
+      :value="exportString"
+      class="export-textarea"
+      spellcheck="false"
+      @click="($event.target as HTMLTextAreaElement).select()"
+    ></textarea>
+
+    <p v-if="errorMessage" class="error">
+      {{ errorMessage }}
+    </p>
+
+    <p v-if="copied" class="copied-message">
+      Save copied successfully!
+    </p>
+
+    <div class="popup-buttons export-buttons">
+      <button @click="copyExport" class="settings-btn">
+        {{ copied ? "Copied!" : "Copy Save" }}
+      </button>
+
+      <button @click="downloadExport" class="settings-btn">
+        Download
+      </button>
+
+      <button
+        @click="showExportPopup = false"
+        class="settings-btn danger"
+      >
+        Close
+      </button>
     </div>
   </div>
+</div>
+
   <div class="automation-section">
   <h3 class="automation-title">Automation</h3>
 
@@ -120,175 +197,250 @@ function togglePointUpgradeAutomation() {
 
 
 <style scoped>
-.automation-section {
-  margin-top: 20px;
-  padding: 15px;
-  border: 2px solid gold;
-  border-radius: 8px;
-  background: #111;
-  width: 25%;
-  margin: 0 auto;
-}
 
-.automation-title {
-  font-family: 'Orbitron', monospace;
-  color: gold;
-  text-shadow: 0 0 10px gold;
-  margin-bottom: 10px;
-}
-
-.enabled {
-  color: lime;
-  text-shadow: 0 0 8px lime;
-  font-family: retro, monospace;
-  text-align: center;
-}
-.automation-section {
-  text-align: center;
-}
-
-.disabled {
-  color: crimson;
-  text-shadow: 0 0 8px crimson;
-  font-family: retro, monospace;
-  text-align: center;
-}
-.enabled,
-.disabled {
-  display: block;       /* makes them full-width */
-  text-align: center;   /* centers the text */
-}
-
-#stylizing {
-  font-family: retro, monospace;
-  color: crimson;
-  text-shadow: 0 0 10px crimson;
-}
-#loadingsave {
-  font-family: retro, monospace;
-  color: gold;
-  text-shadow: 0 0 10px gold;
-}
+/* MAIN SETTINGS */
 .settings-container {
+  width: min(90%, 420px);
+  margin: 45px auto;
+  padding: 25px;
+  background: linear-gradient(145deg, #151515, #090909);
+  border: 1px solid #66521f;
+  border-radius: 12px;
+  box-shadow: 0 0 25px #000;
   text-align: center;
-  margin: 30px auto;
-  max-width: 400px;
 }
 
 .settings-title {
   font-family: 'Orbitron', monospace;
-  color: gold;
-  text-shadow: 0 0 10px gold;
-  margin-bottom: 20px;
+  color: #e8c96a;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  margin-bottom: 25px;
+  text-shadow: 0 0 15px #a17b2c;
 }
 
-/* Base button style */
+/* BUTTONS */
 .settings-btn {
   display: block;
   width: 100%;
   margin: 10px 0;
-  padding: 12px 20px;
+  padding: 13px;
+  position: relative;
+  overflow: hidden;
+  background: #101010;
+  color: #d9bc68;
+  border: 1px solid #725d2c;
+  border-radius: 5px;
   font-family: 'Orbitron', monospace;
-  font-size: 16px;
-  background: linear-gradient(90deg, #111, #333);
-  color: gold;
-  border: 2px solid gold;
-  border-radius: 8px;
+  font-size: 13px;
+  letter-spacing: 1px;
   cursor: pointer;
-  transition: 0.3s;
-  text-shadow: 0 0 8px gold;
+  transition: 0.25s ease;
 }
 
 .settings-btn:hover {
-  background: gold;
-  color: black;
-  box-shadow: 0 0 15px gold;
-  text-shadow: none;
+  background: #302817;
+  border-color: #e8c96a;
+  color: #fff0b0;
+  box-shadow: 0 0 15px #8b702b55;
+  transform: translateY(-2px);
 }
 
-/* Danger button (Hard Reset) */
+.settings-btn:active {
+  transform: scale(0.97);
+}
+
+/* DANGER BUTTONS */
 .settings-btn.danger {
-  border-color: crimson;
-  color: crimson;
-  text-shadow: 0 0 8px crimson;
+  color: #d94b55;
+  border-color: #70252c;
 }
 
 .settings-btn.danger:hover {
-  background: crimson;
-  color: white;
-  box-shadow: 0 0 15px crimson;
-  text-shadow: none;
+  background: #321418;
+  border-color: crimson;
+  color: #ff8b91;
+  box-shadow: 0 0 15px #a0003055;
 }
 
-/* Popup styling */
 .popup-overlay {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7);
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(6px);
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 15px;
 }
 
 .popup {
-  background: #111;
-  border: 2px solid gold;
-  padding: 20px;
-  border-radius: 10px;
-  width: 400px;
-  text-align: center;
+  width: min(420px, 100%);
+  padding: 25px;
+  background: linear-gradient(145deg, #171717, #080808);
+  border: 1px solid #94752e;
+  border-radius: 8px;
+  box-shadow: 0 0 35px #000, 0 0 15px #92732b22;
+  animation: popup-enter 0.25s ease;
 }
 
+@keyframes popup-enter {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+#loadingsave {
+  font-family: retro, monospace;
+  color: #e8c96a;
+  text-shadow: 0 0 12px #b28b35;
+  letter-spacing: 2px;
+  margin-bottom: 15px;
+}
+
+/* TEXT AREAS */
 .popup textarea {
+  box-sizing: border-box;
   width: 100%;
-  height: 100px;
-  margin: 10px 0;
-  background: #222;
-  color: gold;
-  border: 1px solid gold;
+  height: 110px;
+  padding: 12px;
+  resize: vertical;
+  background: #080808;
+  color: #d9bc68;
+  border: 1px solid #594923;
+  border-radius: 5px;
   font-family: monospace;
+  font-size: 12px;
+  outline: none;
+  transition: 0.2s;
 }
 
-.error {
-  color: crimson;
-  font-weight: bold;
-  margin: 5px 0;
+.popup textarea:focus {
+  border-color: #d9bc68;
+  box-shadow: 0 0 10px #d9bc6833;
 }
+
+/* EXPORT */
+.export-popup {
+  width: min(520px, 100%);
+}
+
+.export-description {
+  color: #888;
+  font-family: retro, monospace;
+  font-size: 12px;
+}
+
+.save-info {
+  display: flex;
+  justify-content: space-between;
+  color: #b99b54;
+  font-family: monospace;
+  font-size: 11px;
+}
+
+.export-textarea {
+  height: 150px !important;
+  color: #a9d69a !important;
+  border-color: #536b40 !important;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+
+.export-textarea:focus {
+  border-color: #a9d69a !important;
+  box-shadow: 0 0 12px #a9d69a33 !important;
+}
+
+.copied-message {
+  color: #9bdb82;
+  font-family: retro, monospace;
+  text-shadow: 0 0 8px #75c95c;
+}
+
 
 .popup-buttons {
   display: flex;
   justify-content: space-around;
+  gap: 8px;
+  margin-top: 15px;
 }
-/* Popup buttons inherit the same retro style */
+
 .popup-buttons .settings-btn {
   flex: 1;
-  margin: 0 5px;
-  background: linear-gradient(90deg, #111, #333);
-  color: gold;              /* <-- force visible text */
-  border: 2px solid gold;
-  text-shadow: 0 0 8px gold;
+  margin: 0;
+  padding: 11px 5px;
+  font-size: 11px;
 }
 
-.popup-buttons .settings-btn:hover {
-  background: gold;
-  color: black;
-  box-shadow: 0 0 15px gold;
-  text-shadow: none;
+/* ERRORS */
+.error,
+#stylizing {
+  color: #e05260;
+  font-family: retro, monospace;
+  text-shadow: 0 0 8px #b52235;
+  font-size: 12px;
 }
 
-/* Danger button inside popup */
-.popup-buttons .settings-btn.danger {
-  border-color: crimson;
-  color: crimson;           /* <-- force visible text */
-  text-shadow: 0 0 8px crimson;
+/* AUTOMATION */
+.automation-section {
+  width: min(90%, 420px);
+  box-sizing: border-box;
+  margin: 30px auto;
+  padding: 22px;
+  background: #0d0d0d;
+  border: 1px solid #594923;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 5px 20px #000;
 }
 
-.popup-buttons .settings-btn.danger:hover {
-  background: crimson;
-  color: white;
-  box-shadow: 0 0 15px crimson;
-  text-shadow: none;
+.automation-title {
+  font-family: 'Orbitron', monospace;
+  color: #c9a94f;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+}
+
+.enabled,
+.disabled {
+  display: block;
+  margin-top: 8px;
+  font-family: retro, monospace;
+  text-align: center;
+}
+
+.enabled {
+  color: #8edb79;
+  text-shadow: 0 0 10px #55b93e;
+}
+
+.disabled {
+  color: #d94b55;
+  text-shadow: 0 0 10px #b52235;
+}
+
+/* SMALL SCREENS */
+@media (max-width: 500px) {
+  .settings-container,
+  .automation-section {
+    width: 95%;
+  }
+
+  .popup {
+    padding: 18px;
+  }
+
+  .popup-buttons .settings-btn {
+    font-size: 10px;
+  }
 }
 
 </style>

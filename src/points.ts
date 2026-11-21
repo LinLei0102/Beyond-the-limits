@@ -8,12 +8,14 @@ import type { upgrades } from "./player"
 import type { RepeatableUpgrade } from "./player"
 import { pointupgrepenabled } from "./settings"
 import { solarenergyboost } from "./infinity/infinity"
+import { crops } from "./infinity/FoI"
+import { ELs } from "./infinity/EL"
+import { delRepeats } from "./infinity/del"
 
 export function pointgen(): Decimal {
   let gain = new Decimal(1)
-
+  
   const safeLog10 = (x: Decimal) => x.gt(0) ? x.log10() : new Decimal(0)
-
   if (player.pupgrades[0]?.bought) gain = gain.mul(2)
   if (player.pupgrades[1]?.bought) gain = gain.mul(3)
 
@@ -37,7 +39,7 @@ export function pointgen(): Decimal {
   } else {
     gain = gain.gt(0) ? gain.pow(0.5) : gain
   }
-  
+
   if (player.pupgrades[17]?.bought) gain = gain.mul(5)
   if (player.pupgrades[18]?.bought) gain = gain.mul(player.pupgrades[18].effect?.() ?? 1)
   if (player.repeatableUpgrades[0]?.amountbought?.gte(1)) {
@@ -60,15 +62,43 @@ export function pointgen(): Decimal {
     if (player.pupgrades[15]?.bought) gain = gain.mul(5)
   }
 
-  if(player.gods.god1com) { gain = gain.pow(1.5)}
-  if(player.gods.god1com) { gain = gain.times(10)}
+  if(player.gods.god1com) { gain = gain.pow(1.1)}
+  if(player.gods.god1com) { gain = gain.times(1e10)}
 
   if (player.pupgrades[22].bought) { gain = gain.times('1e20')}
-  if (player.pupgrades[23].bought) { gain = gain.pow(1.2)}
+  if (player.pupgrades[23].bought) { gain = gain.times('1e30')}
   if (player.pupgrades[24].bought) {gain = gain.mul(1e65)}
-  if (player.fupgrades[7]?.bought) { gain = gain.mul(player.fupgrades[7].effect?.() ?? 1)}
-  if(player.fupgrades[5]?.bought) { gain = gain.mul(10)}
+  if (player.fupgrades[7].bought) { gain = gain.mul(player.fupgrades[7].effect?.() ?? 1)}
   if (player.iupgrades[0]?.bought && player.infinity.solarity.solarenergy.gte(0.0001)) { gain = gain.mul(solarenergyboost())}
+  if (player.infinity.calamitytier.gte(1)) { gain = gain.pow(0.5)}
+  
+  if (player.infinity.calamitytier.gte(2) && crops[0].effect().gte(0.1) && !player.infinity.calamitytier.gte(3)) { gain = gain.pow(crops[0].effect() ?? new Decimal("1"))}
+  
+    if(player.infinity.calamitytier.gte(1)) gain = gain.pow(ELs[0].effect())
+      
+    if(player.infinity.calamitytier.gte(1)) gain = gain.mul(ELs[1].effect())
+    if(player.infinity.hmatter.gte(1)) gain = gain.mul(player.infinity.hmatter.mul(1e10))
+    if(player.infinity.hmatter.gte(10)) gain = gain.mul(player.infinity.matter.add(1).log10().pow(1.25))
+    if(player.infinity.hmatter.gte(1e15)) gain = gain.mul('1e350')
+    if(player.iupgrades[2].bought) gain = gain.mul(3)
+    if(player.maincurrencies.Points.gte('1e800') && player.infinity.calamitytier.eq(2)) { gain = gain.pow(0.1)}
+    if(player.infinity.calamitytier.gte(3)) {
+      gain = gain.pow(0.1)
+      gain = gain.pow(player.infinity.stats.bestStage.mul(0.1).add(1))
+    }
+if (gain.gt("1e10000")) {
+  gain = gain.div("1e10000").pow(0.1).mul("1e10000")
+}
+if (gain.gt("1e50000")) {
+  gain = gain.div("1e50000").pow(0.05).mul("1e50000")
+}
+if (gain.gt("1e100000")) {
+  gain = gain.div("1e100000").pow(0.005).mul("1e100000")
+}
+if(player.infinity.del.inDel) {gain = gain.log10()
+  gain = gain.div(1000)
+}
+if(player.infinity.del.inDel && delRepeats[1].effect().gte(1)) gain = gain.mul(delRepeats[1].effect())
   return gain.isFinite() && !gain.isNan() ? gain : new Decimal(1)
 }
 export const pupgrades: upgrades[] = reactive([
@@ -278,17 +308,17 @@ export const pupgrades: upgrades[] = reactive([
 
   { 
     id: "22",
-    title: "Welcome back.",
-    description: "Hi! x1e20 points!!",
-    cost: new Decimal('1e66'),
+    title: "Jump.",
+    description: "x1e20 points",
+    cost: new Decimal('1e53'),
     bought: false,
     pointboost: true,
   },
   {
     id: "23",
-    title: "Hope the automation is nice!",
-    description: "It's nice isn't it? ^1.2 points",
-    cost: new Decimal('1e123'),
+    title: "The higher hopes",
+    description: "x1e30 points",
+    cost: new Decimal('5e107'),
     bought: false,
     pointboost: true,
   },
@@ -402,6 +432,7 @@ export const repeatableUpgrades = reactive<RepeatableUpgrade[]>([
       const amt = this.amountbought
       let scale = this.basecost.mul(Decimal.pow(1.5, amt))
       if (amt.gt(50)) scale = scale.mul(Decimal.pow(2, amt.sub(50)))
+      if (player.infinity.calamitytier.gte(1)) scale = scale.mul("1e5000000")
       return scale
     },
     pointboost: true,
@@ -423,6 +454,7 @@ export const repeatableUpgrades = reactive<RepeatableUpgrade[]>([
       const amt = this.amountbought
       let scale = this.basecost.mul(Decimal.pow(1.75, amt))
       if (amt.gt(25)) scale = scale.mul(Decimal.pow(2, amt.sub(25)))
+      if (player.infinity.calamitytier.gte(1)) scale = scale.mul("1e5000000")
       return scale
     },
     CPointsboost: true,
@@ -444,6 +476,8 @@ export const repeatableUpgrades = reactive<RepeatableUpgrade[]>([
       const amt = this.amountbought
       let scale = this.basecost.mul(Decimal.pow(2, amt))
       if (amt.gte(20)) scale = scale.mul(Decimal.pow(2, amt.sub(20)))
+      if (player.infinity.calamitytier.gte(1)) scale = scale.mul("1e5000000")
+      
       return scale
     },
     FPboost: true,
@@ -495,7 +529,7 @@ export function getRepeatableCost(upg: RepeatableUpgrade): Decimal {
 
 export function buyRepeatable(upg: RepeatableUpgrade) {
   const nextCost = getRepeatableCost(upg)
-  if (player.maincurrencies.Points.gte(nextCost)) {
+  if (player.maincurrencies.Points.gte(nextCost) && !player.infinity.calamitytier.gte(1)) {
     player.maincurrencies.Points = player.maincurrencies.Points.sub(nextCost)
     upg.amountbought = upg.amountbought.add(1)
   }
@@ -523,7 +557,7 @@ export function autoBuyAll() {
     }
   }
 
-  
+  if(!player.infinity.calamitytier.gte(1)) {
   for (const upg of player.repeatableUpgrades) {
     let nextCost = upg.scaling()
 
@@ -534,6 +568,7 @@ export function autoBuyAll() {
       nextCost = upg.cost
     }
   }
+}
 }
 export const upgradeCosts = computed(() => {
   return player.pupgrades.map((u, i) => {

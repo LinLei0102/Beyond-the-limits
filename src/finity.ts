@@ -3,6 +3,7 @@ import Decimal from "break_eternity.js";
 import { player } from "./player";
 import type { upgrades } from "./player";
 import { formatNumber } from "./format";
+import { ELs } from "./infinity/EL";
 export function canResetFinity(): boolean {
   if (player.FCo.inFinalCorruption) return false
   return player.finity.unlocked && player.maincurrencies.Points.gte(player.finity.requirement);
@@ -15,6 +16,8 @@ export function FPgain() {
   if(player.pupgrades[16].bought) gain = gain.mul(player.pupgrades[16].effect?.() ?? new Decimal("1"))
   if(player.repeatableUpgrades[2].amountbought.gte(1)) gain = gain.mul(player.repeatableUpgrades[2].effect?.() ?? new Decimal("1"))
   if(player.pupgrades[21].bought) gain = gain.mul(10)
+  if(player.infinity.calamitytier.gte(2)) gain = gain.mul(0)
+  if(player.iupgrades[1].bought) gain = gain.mul(3)
   return gain
 }
 
@@ -112,15 +115,16 @@ export const fupgrades = reactive([
     id: "7",
     title: "Some help",
     description: "Based on FP, boost points ",
-    cost: new Decimal("1e18"),
-    effect() {
-      return player.maincurrencies.FP.log10().pow(0.5)
+    cost: new Decimal("1e15"),
+    effect(): Decimal {
+      return player.maincurrencies.FP.pow(0.3)
     },
     effectDisplay() {
       return "Currently x" + formatNumber(this.effect?.() ?? new Decimal(1)) + " points"
     },
-    bought:false
-  }
+    bought:false,
+  },
+
 ])
 export function buyFpUpgrade(index: number) {
   const def = fupgrades[index]
