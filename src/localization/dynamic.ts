@@ -37,7 +37,7 @@ export const dynamicRegReplace: Array<[RegExp, string]> = [
   [/^Chaotically bond into a new being and gain ([\d,.eE+\-∞]+[A-Za-z]{0,3}) hadronic matter \(Requirement: 10 matter-X\)$/, "混沌结合为新存在，获得 $1 强子物质（需求：10 物质-X）"],
   [/^You have ([\d,.eE+\-∞]+[A-Za-z]{0,3}) entropy$/, "你拥有 $1 熵"],
   [/^This boosts damage, defense, CE, HP and CoSP by x([\d,.eE+\-∞]+[A-Za-z]{0,3})!$/, "这会使伤害、防御、灾厄能量、生命值和宇宙点数提升 x$1！"],
-  [/^Let an old era explode into new greatness! Gain ([\d,.eE+\-∞]+[A-Za-z]{0,3}) entropy, caused by the chaos, at the cost of all calamity energy features\.$/, "让旧纪元爆发为新的伟大！以所有灾厄能量特性为代价，获得由混沌引发的 $1 熵。"],
+  [/^Let an old era explode into new greatness! Gain ([\d,.eE+\-∞]+[A-Za-z]{0,3}) entropy, caused by the chaos, at the cost of all calamity energy features\.$/, "让旧纪元爆发为新的伟大！以所有灾厄能量特性为代价，通过超新星获得 $1 熵。"],
   [/^S\.E additionally boosts eternal energy by x([\d,.eE+\-∞]+[A-Za-z]{0,3})$/, "太阳能额外使永恒能量提升 x$1"],
   [/^S\.E also boosts matter by x([\d,.eE+\-∞]+[A-Za-z]{0,3})$/, "太阳能也使物质提升 x$1"],
   [/^S\.E also boosts calamity energy by x([\d,.eE+\-∞]+[A-Za-z]{0,3})$/, "太阳能也使灾厄能量提升 x$1"],

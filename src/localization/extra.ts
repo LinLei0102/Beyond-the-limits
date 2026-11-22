@@ -302,7 +302,7 @@ export const extraDictionary: Record<string, string> = {
   'corrupted matter': '腐化物质',
   'cosmic points': '宇宙点数',
   'cosmic points.': '宇宙点数。',
-  'entropy, caused by the chaos, at the cost of all calamity energy features.': '由混沌产生的熵，代价是所有灾厄能量相关功能。',
+  'entropy, caused by the chaos, at the cost of all calamity energy features.': '通过超新星获得的熵，代价是所有灾厄能量相关功能。',
   'eternal energy': '永恒能量',
   'following:': '以下效果：',
   'hadronic matter': '强子物质',
