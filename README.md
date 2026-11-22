@@ -17,7 +17,7 @@ npm install
 npm run dev
 ```
 
-然后打开终端输出的地址（本仓库 `vite.config.ts` 设置了 `base: "/project-test/"`，通常是 http://localhost:5173/project-test/ ）。
+然后打开终端输出的地址（本仓库 `vite.config.ts` 的 `base` 设为 `/Beyond-the-limits/`，通常是 http://localhost:5173/Beyond-the-limits/ ）。
 
 测试构建产物：
 
@@ -26,7 +26,11 @@ npm run build
 npm run preview
 ```
 
-再打开预览服务给出的地址；不要直接用浏览器打开 `dist/index.html`。
+再打开预览服务给出的地址（如 http://localhost:4173/Beyond-the-limits/）；不要直接用浏览器打开 `dist/index.html`。
+
+## 在线部署
+
+`.github/workflows/deploy.yml` 会在推送到 `main` 后自动构建 `dist` 并发布到 GitHub Pages。Pages 设置需选择「GitHub Actions」作为构建来源。站点地址：https://linlei0102.github.io/Beyond-the-limits/
 
 ---
 
