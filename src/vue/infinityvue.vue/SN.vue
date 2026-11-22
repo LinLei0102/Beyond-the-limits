@@ -37,7 +37,7 @@ import { player } from '../../player';
   <p>{{ rupg.description }}</p>
 
   <div class="sp-stats">
-    <p>Cost: {{ formatNumber(rupg.cost()) }} CoSP</p>
+    <p>Cost: {{ formatNumber(rupg.cost()) }} entropy</p>
     <p>{{ rupg.effectDisplay() }}</p>
     <p>Bought: {{ formatNumber(rupg.amountbought) }}</p>
   </div>
