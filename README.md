@@ -1,4 +1,4 @@
-# 极限之上（Beyond the limits）· 汉化版
+# 突破极限（Beyond the limits）· 汉化版
 
 ## 汉化说明
 

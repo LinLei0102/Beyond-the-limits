@@ -1,12 +1,12 @@
 /**
- * 译文字典 —— 迁移自林雷的油猴汉化脚本《极限之上》，并补充了原脚本未覆盖的内容。
+ * 译文字典 —— 迁移自林雷的油猴汉化脚本，并补充了原脚本未覆盖的内容。
  * 键为游戏原文，值为译文。请勿修改键名，否则会失去匹配。
  */
 // @ts-nocheck
 
 export const baseDictionary: Record<string, string> = {
         //Settings 设置
-        'Beyond the limits': '极限之上',
+        'Beyond the limits': '突破极限',
         'Automation': '自动化',
         'Export Save': '导出存档',
         'Hard Reset': '硬重置',
