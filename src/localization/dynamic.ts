@@ -55,4 +55,7 @@ export const dynamicRegReplace: Array<[RegExp, string]> = [
   [/^Boosting such by x([\d,.eE+\-∞]+[A-Za-z]{0,3})$/, "使其提升 x$1"],
   [/^([\d,.eE+\-∞]+[A-Za-z]{0,3})m ([\d,.eE+\-∞]+[A-Za-z]{0,3})s left$/, "剩余 $1 分 $2 秒"],
   [/^([\d,.eE+\-∞]+[A-Za-z]{0,3})s left$/, "剩余 $1 秒"],
+  [/^Currently \/([\d,.eE+\-∞]+[A-Za-z]{0,3})$/, "当前 /$1"],
+  [/^Currently \^([\d,.eE+\-∞]+[A-Za-z]{0,3})$/, "当前 ^$1"],
+  [/^Currently ([\d,.eE+\-∞]+[A-Za-z]{0,3})$/, "当前 $1"],
 ]
