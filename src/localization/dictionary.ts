@@ -6,7 +6,7 @@
 
 export const baseDictionary: Record<string, string> = {
         //Settings 设置
-        'Beyond the limits': '突破极限',
+        'Beyond the limits': '超越极限',
         'Automation': '自动化',
         'Export Save': '导出存档',
         'Hard Reset': '硬重置',
@@ -73,7 +73,7 @@ export const baseDictionary: Record<string, string> = {
         'x1.5 FP (finity points)': 'x1.5 有限点数',
         'Corrupted finity': '腐化有限领域',
         'Based on best points in corruption, gain more FP': '根据腐化中的最高积分获得更多有限点数',
-        'Pushing the limits.': '突破极限。',
+        'Pushing the limits.': '超越极限。',
         'x5 points': 'x5 点数',
         'Converging to corruption': '汇聚于腐化',
         'Further boost points based on corruption points': '根据腐化点数进一步提升点数',
