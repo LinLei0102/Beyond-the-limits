@@ -7,6 +7,7 @@
  */
 import { baseDictionary, cnPrefix, cnPostfix, cnExcludeWhole, baseRegReplace } from './dictionary'
 import { extraDictionary, termDictionary } from './extra'
+import { dynamicRegReplace } from './dynamic'
 
 const STORAGE_KEY = 'beyond-the-limits-chinese'
 
@@ -28,6 +29,7 @@ const termRules: Rule[] = Object.entries(termDictionary)
   .map(([key, value]) => [new RegExp(escapeRegExp(key), 'g'), value])
 
 const allRules: Rule[] = [
+  ...dynamicRegReplace,
   ...baseRegReplace,
   ...prefixTerms,
   ...postfixTerms,
