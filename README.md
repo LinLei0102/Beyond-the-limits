@@ -6,7 +6,7 @@
 
 - 汉化实现位于 `src/localization/`：`dictionary.ts` 为原脚本字典与规则，`extra.ts` 为新增译文与术语兜底，`index.ts` 为运行时翻译引擎。
 - 只替换界面显示文本，不修改游戏状态、存档键名或数值逻辑，因此与英文版存档完全兼容。
-- 默认开启汉化。如需临时切回英文，可在浏览器控制台执行 `setChineseTranslation(false)`；恢复执行 `setChineseTranslation(true)`。切换后页面会刷新。
+- 默认开启汉化。设置页提供「中文 / English」切换按钮，选择后页面会刷新；也可在浏览器控制台执行 `setChineseTranslation(false)` 切回英文、`setChineseTranslation(true)` 恢复中文。
 - 构建与运行：`npm install` → `npm run dev`（开发）/ `npm run build`（构建）。
 - **不要直接双击打开 `index.html`**：Vite 使用 ES 模块，`file://` 协议会触发 CORS 拦截，且 `/femmylogo.png` 会被解析成磁盘根目录路径而 404。必须通过本地 HTTP 服务访问。
 

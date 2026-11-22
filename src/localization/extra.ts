@@ -344,6 +344,7 @@ export const extraDictionary: Record<string, string> = {
   'Download': '下载',
   'Matter': '物质',
   'Milestones': '里程碑',
+  'Language': '语言',
   'At 2.71e738056 matter, gain is double logged by 10 ( log10(log10(x)) )': '在 2.71e738056 物质时，收益双重取对数并乘以 10（log10(log10(x))）',
   'Blue': '蓝色',
   'Energetic': '活力四射',

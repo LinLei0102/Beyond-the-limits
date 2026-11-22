@@ -4,7 +4,9 @@ import { ref } from "vue"
 import { loadGame, saveGame, hardReset, exportSaveString } from "../save"
 import { matterionAutomationEnabled, pointupgrepenabled } from "../settings"
 import { player } from "../player"
+import { isChineseTranslationEnabled, setChineseTranslation } from "../localization"
 
+const chineseEnabled = ref(isChineseTranslationEnabled())
 const showLoadPopup = ref(false)
 const showExportPopup = ref(false)
 const showConfirmReset = ref(false)
@@ -95,6 +97,20 @@ function togglePointUpgradeAutomation() {
     <button @click="showLoadPopup = true" class="settings-btn">Load Save</button>
     <button @click="exportSave" class="settings-btn">Export Save</button>
     <button @click="showConfirmReset = true" class="settings-btn danger">Hard Reset</button>
+
+    <div class="language-section">
+      <h3 class="language-title">Language</h3>
+      <button
+        @click="setChineseTranslation(true)"
+        class="settings-btn language-btn"
+        :class="{ active: chineseEnabled }"
+      >中文</button>
+      <button
+        @click="setChineseTranslation(false)"
+        class="settings-btn language-btn"
+        :class="{ active: !chineseEnabled }"
+      >English</button>
+    </div>
 
     <div v-if="showConfirmReset" class="popup-overlay">
       <div class="popup">
@@ -248,6 +264,32 @@ function togglePointUpgradeAutomation() {
 
 .settings-btn:active {
   transform: scale(0.97);
+}
+
+/* LANGUAGE SWITCH */
+.language-section {
+  margin-top: 22px;
+}
+
+.language-title {
+  color: #e8c96a;
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+}
+
+.language-btn {
+  display: inline-block;
+  width: auto;
+  min-width: 96px;
+  margin: 0 5px;
+}
+
+.language-btn.active {
+  background: #302817;
+  border-color: #e8c96a;
+  color: #fff0b0;
+  box-shadow: 0 0 15px #8b702b55;
 }
 
 /* DANGER BUTTONS */
