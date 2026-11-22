@@ -42,4 +42,7 @@ export const dynamicRegReplace: Array<[RegExp, string]> = [
   [/^S\.E also boosts matter by x(.+?)$/, "太阳能也使物质提升 x$1"],
   [/^S\.E also boosts calamity energy by x(.+?)$/, "太阳能也使灾厄能量提升 x$1"],
   [/^(.+?) characters$/, "$1 个字符"],
+  [/^Cost: (.+?) CE$/, "费用：$1 灾厄能量"],
+  [/^HP: (.+?)\/(.+?)$/, "生命值：$1/$2"],
+  [/^XP: (.+?) \/ (.+?)$/, "经验：$1 / $2"],
 ]
