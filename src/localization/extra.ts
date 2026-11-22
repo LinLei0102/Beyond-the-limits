@@ -58,7 +58,12 @@ export const extraDictionary: Record<string, string> = {
   'Just note from now on.': '从现在起记住这点。',
   'Just then, he disappears. He isn\'t too pleased about your presence': '就在这时，他消失了。他对你出现在这里并不太高兴',
   'Now it feels lonely, only guarding the tower alone now that he and phthoros is gone...': '如今只剩孤独，他与弗托罗斯离去后，只有我独自守着这座塔……',
+  'Oh': '哦',
   'Oh...': '哦……',
+  'Wow, that\'s impressive': '哇，真厉害',
+  'Well, i\'ll let you figure that out on your own.': '好吧，你自己想办法弄明白吧。',
+  'Maybe it\'s better if you quit as well.': '也许你也放弃比较好。',
+  '.......': '……',
   'Phthoros had alerted one of my probes about your presence': '弗托罗斯提醒过我的一台探测器，说你来了',
   'Rejuvenating soul.': '焕新之魂。',
   'Solar coalessence': '太阳凝聚',
@@ -325,6 +330,8 @@ export const extraDictionary: Record<string, string> = {
   'Harvest': '收获',
   'Auto': '自动',
   'Reset': '重置',
+  '^1.2 damage.': '伤害 ^1.2。',
+  '^1.05 damage.': '伤害 ^1.05。',
 }
 
 /** 片段兜底词表：Vue 模板常把一句话拆成多个文本节点，按词补全。 */

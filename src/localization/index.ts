@@ -48,19 +48,22 @@ function isExcluded(text: string): boolean {
 /** 把一段界面文本从英文译为中文。已经全是中文/数字的文本会原样返回。 */
 export function translateText(input: string): string {
   if (typeof input !== 'string' || !input) return input
-  if (!/[A-Za-z]/.test(input)) return input
-  // 永恒字母格子里的 A、B、C 等单个字母保持原样；但 "/s)" 这类片段仍需翻译
-  if (/^[A-Za-z]$/.test(input.trim())) return input
 
   // 原样保留首尾空白，避免破坏排版和 Vue 的文本节点对比
   const leading = /^\s*/.exec(input)?.[0] ?? ''
   const trailing = /\s*$/.exec(input)?.[0] ?? ''
   let text = input.slice(leading.length, input.length - trailing.length)
   if (!text) return input
-  if (isExcluded(text)) return input
 
+  // 精确匹配优先：这样纯标点文本（如 "......."）也能走字典
   const exact = Object.prototype.hasOwnProperty.call(dictionary, text) ? dictionary[text] : undefined
   if (exact !== undefined) return leading + exact + trailing
+
+  if (isExcluded(text)) return input
+
+  if (!/[A-Za-z]/.test(text)) return input
+  // 永恒字母格子里的 A、B、C 等单个字母保持原样；但 "/s)" 这类片段仍需翻译
+  if (/^[A-Za-z]$/.test(text)) return input
 
   // 规则按顺序累积应用：先处理整句模式，再逐步把剩余英文片段换成中文
   for (const [pattern, replacement] of allRules) {
