@@ -58,4 +58,5 @@ export const dynamicRegReplace: Array<[RegExp, string]> = [
   [/^Currently \/([\d,.eE+\-∞]+[A-Za-z]{0,3})$/, "当前 /$1"],
   [/^Currently \^([\d,.eE+\-∞]+[A-Za-z]{0,3})$/, "当前 ^$1"],
   [/^Currently ([\d,.eE+\-∞]+[A-Za-z]{0,3})$/, "当前 $1"],
+  [/^Endorse the infinity for ([\d,.eE+\-∞]+[A-Za-z]{0,3}) IP$/, "认可无限，获得 $1 无限点数"],
 ]
