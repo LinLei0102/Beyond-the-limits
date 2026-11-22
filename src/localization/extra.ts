@@ -345,6 +345,12 @@ export const extraDictionary: Record<string, string> = {
   'Matter': '物质',
   'Milestones': '里程碑',
   'At 2.71e738056 matter, gain is double logged by 10 ( log10(log10(x)) )': '在 2.71e738056 物质时，收益双重取对数并乘以 10（log10(log10(x))）',
+  'Blue': '蓝色',
+  'Energetic': '活力四射',
+  'Fillllleeeeerrrrrrrr': '填——充——物——',
+  'Trax': '特拉克斯',
+  'Afterimage': '残影',
+  'Increase CoSP (Cosmic points) gain by x3': '宇宙点数获取 x3',
 }
 
 /** 片段兜底词表：Vue 模板常把一句话拆成多个文本节点，按词补全。 */
